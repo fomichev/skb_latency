@@ -63,24 +63,55 @@ def draw_bars(l, r):
 def map_uniform(v, f, t):
     return int((v - f[0]) * (t[1] - t[0]) / (f[1] - f[0]) + t[0])
 
+def avg(vals):
+    tot = 0
+    num = 0
+
+    x = 0
+    for v in vals:
+        tot += x * v
+        num += v
+
+        if x < 100:
+            x += 1
+        elif x < 1000:
+            x += 10
+        else:
+            x += 100
+
+    if num == 0:
+        return 0
+
+    return tot // num
+
 def draw(vals):
     top = []
     med = []
     bot = []
     leg = []
 
-    i = 0
+    x = 0
     for l, r in zip(*[iter(vals)]*2):
         bars = draw_bars(l, r)
         top.append(bars[0])
         med.append(bars[1])
         bot.append(bars[2])
 
-        if i % 4 == 0:
-            t = i * 2
-            leg.append(f"{t:<4}")
-
-        i += 1
+        if x < 100:
+            if x % 8 == 0:
+                if x == 96:
+                    leg.append(f"㏒") # 2 columns
+                else:
+                    leg.append(f"{x:<4}")
+            x += 2
+        elif x < 1000:
+            if x % 100 == 0:
+                leg.append(f"{x:<5}")
+            x += 2 * 10
+        else:
+            if x % 1000 == 0 and x % 2000 != 0:
+                leg.append(f"{x:<10}")
+            x += 2 * 100
 
     print("".join(top))
     print("".join(med))
@@ -88,13 +119,16 @@ def draw(vals):
     print("".join(leg))
 
 def draw_points(name, points):
-    print(f"{name}:")
+    print(f"{name} {sum(points)} samples, {avg(points)}us average")
 
     if len(points) % 2 == 1:
         points.append(0)
 
     mx = max(points)
-    vals = [map_uniform(x, (0, mx), (1, 12)) for x in points]
+    if mx > 0:
+        vals = [map_uniform(x, (0, mx), (1, 12)) for x in points]
+    else:
+        vals = [0, 0]
     draw(vals)
 
 for line in sys.stdin:
@@ -104,3 +138,4 @@ for line in sys.stdin:
     points.pop(0)
     points = [int(x) for x in points]
     draw_points(name, points)
+    print()
