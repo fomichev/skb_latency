@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
+import argparse
 import sys
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-s', '--scale', type=str, default='us')
+args = parser.parse_args()
 
 def draw_pair(l, r):
     symbols = {
@@ -119,7 +124,7 @@ def draw(vals):
     print("".join(leg))
 
 def draw_points(name, points):
-    print(f"{name} {sum(points)} samples, {avg(points)}us average")
+    print(f"{name} {sum(points)} samples, {avg(points)}{args.scale} average")
 
     if len(points) % 2 == 1:
         points.append(0)
